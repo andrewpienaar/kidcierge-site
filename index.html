@@ -22,7 +22,6 @@
       overflow: hidden;
     }
 
-    /* subtle animated gradient background */
     body::before {
       content: "";
       position: fixed;
@@ -74,11 +73,18 @@
       margin-bottom: 3rem;
     }
 
+    /* ── Form states ─────────────────────────────────────────── */
     .notify-form {
       display: flex;
       gap: 0.5rem;
       max-width: 380px;
-      margin: 0 auto 2.5rem;
+      margin: 0 auto 1.5rem;
+      transition: opacity 0.3s;
+    }
+
+    .notify-form.loading {
+      opacity: 0.5;
+      pointer-events: none;
     }
 
     .notify-form input {
@@ -93,13 +99,8 @@
       transition: border-color 0.2s;
     }
 
-    .notify-form input::placeholder {
-      color: rgba(255,255,255,0.3);
-    }
-
-    .notify-form input:focus {
-      border-color: rgba(255,255,255,0.3);
-    }
+    .notify-form input::placeholder { color: rgba(255,255,255,0.3); }
+    .notify-form input:focus { border-color: rgba(255,255,255,0.3); }
 
     .notify-form button {
       padding: 0.75rem 1.2rem;
@@ -112,16 +113,28 @@
       cursor: pointer;
       white-space: nowrap;
       transition: opacity 0.2s;
+      min-width: 100px;
     }
 
-    .notify-form button:hover {
-      opacity: 0.88;
+    .notify-form button:hover { opacity: 0.88; }
+
+    /* ── Status messages ─────────────────────────────────────── */
+    .status-msg {
+      font-size: 0.88rem;
+      min-height: 1.2em;
+      margin-bottom: 1rem;
+      transition: all 0.3s;
     }
+
+    .status-msg.success { color: #4ecca3; }
+    .status-msg.error   { color: #ff7f7f; }
+    .status-msg.hidden  { opacity: 0; }
 
     .footer-note {
       font-size: 0.78rem;
       color: rgba(255,255,255,0.22);
       letter-spacing: 0.02em;
+      margin-top: 1rem;
     }
   </style>
 </head>
@@ -131,23 +144,94 @@
     <h1>Something great<br>is on its way.</h1>
     <p class="tagline">The smart way to find activities for your kids.<br>Launching soon.</p>
 
-    <form class="notify-form" onsubmit="handleSubmit(event)">
-      <input type="email" id="email" placeholder="your@email.com" required />
-      <button type="submit">Notify me</button>
+    <form class="notify-form" id="waitlistForm">
+      <input
+        type="email"
+        id="emailInput"
+        placeholder="your@email.com"
+        autocomplete="email"
+        required
+      />
+      <button type="submit" id="submitBtn">Notify me</button>
     </form>
 
-    <p class="footer-note" id="status">&copy; 2026 Kidcierge</p>
+    <p class="status-msg hidden" id="statusMsg"></p>
+    <p class="footer-note">&copy; 2026 Kidcierge</p>
   </div>
 
   <script>
-    function handleSubmit(e) {
+    // ── CONFIGURATION ────────────────────────────────────────────────────────
+    //
+    // After deploying your Apps Script as a Web App, paste the URL here.
+    // It looks like:
+    //   https://script.google.com/macros/s/AKfycb.../exec
+    //
+    var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzzHL0RlXr8-vHIwAUjY9f-52FFDp2DLyai4E1eJ7MwVIf5FzVnFjdh5sPtg7V2qbAh/exec";
+    // ────────────────────────────────────────────────────────────────────────
+
+    var form       = document.getElementById("waitlistForm");
+    var emailInput = document.getElementById("emailInput");
+    var submitBtn  = document.getElementById("submitBtn");
+    var statusMsg  = document.getElementById("statusMsg");
+
+    form.addEventListener("submit", function(e) {
       e.preventDefault();
-      const status = document.getElementById("status");
-      status.textContent = "You're on the list. We'll be in touch.";
-      status.style.color = "rgba(255,255,255,0.5)";
-      document.querySelector(".notify-form").style.opacity = "0.4";
-      document.querySelector(".notify-form input").disabled = true;
-      document.querySelector(".notify-form button").disabled = true;
+
+      var email = emailInput.value.trim();
+      if (!email) return;
+
+      // Guard: URL not configured yet
+      if (SCRIPT_URL === "https://script.google.com/macros/s/AKfycbzzHL0RlXr8-vHIwAUjY9f-52FFDp2DLyai4E1eJ7MwVIf5FzVnFjdh5sPtg7V2qbAh/exec") {
+        showStatus("error", "Form not configured yet. Check the SCRIPT_URL in index.html.");
+        return;
+      }
+
+      // Set loading state
+      form.classList.add("loading");
+      submitBtn.textContent = "Sending\u2026";
+      clearStatus();
+
+      // POST to Apps Script web app
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email,
+          source: "kidcierge.ai"
+        })
+      })
+      .then(function(res) {
+        return res.json();
+      })
+      .then(function(data) {
+        if (data.success) {
+          form.style.display = "none";
+          showStatus("success", "You\u2019re on the list. We\u2019ll be in touch when we launch.");
+        } else {
+          resetForm();
+          showStatus("error", data.error || "Something went wrong. Please try again.");
+        }
+      })
+      .catch(function(err) {
+        resetForm();
+        showStatus("error", "Couldn\u2019t reach the server. Please try again in a moment.");
+        console.error("Submission error:", err);
+      });
+    });
+
+    function showStatus(type, message) {
+      statusMsg.textContent = message;
+      statusMsg.className = "status-msg " + type;
+    }
+
+    function clearStatus() {
+      statusMsg.textContent = "";
+      statusMsg.className = "status-msg hidden";
+    }
+
+    function resetForm() {
+      form.classList.remove("loading");
+      submitBtn.textContent = "Notify me";
     }
   </script>
 </body>
