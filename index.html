@@ -166,7 +166,7 @@
     // It looks like:
     //   https://script.google.com/macros/s/AKfycb.../exec
     //
-    var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzzHL0RlXr8-vHIwAUjY9f-52FFDp2DLyai4E1eJ7MwVIf5FzVnFjdh5sPtg7V2qbAh/exec";
+    var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyqCOWv4xHO--3UqbN2B1APaht9B-QuJI1rhoFSJy_EYyvlADoC5_3p4EjL7f5Z8RSs/exec";
     // ────────────────────────────────────────────────────────────────────────
 
     var form       = document.getElementById("waitlistForm");
@@ -192,14 +192,7 @@
       clearStatus();
 
       // POST to Apps Script web app
-      fetch(SCRIPT_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: email,
-          source: "kidcierge.ai"
-        })
-      })
+      fetch(SCRIPT_URL + "?email=" + encodeURIComponent(email) + "&source=kidcierge.ai")
       .then(function(res) {
         return res.json();
       })
