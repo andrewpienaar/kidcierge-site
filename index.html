@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kidcierge — Coming Soon</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0f0f13;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #fff;
+      overflow: hidden;
+    }
+
+    /* subtle animated gradient background */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: -50%;
+      background: radial-gradient(ellipse at 30% 40%, rgba(99, 60, 220, 0.18) 0%, transparent 60%),
+                  radial-gradient(ellipse at 75% 65%, rgba(34, 180, 160, 0.12) 0%, transparent 55%);
+      animation: drift 12s ease-in-out infinite alternate;
+      z-index: 0;
+    }
+
+    @keyframes drift {
+      from { transform: translate(0, 0) rotate(0deg); }
+      to   { transform: translate(2%, 2%) rotate(1deg); }
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 2rem;
+      max-width: 520px;
+    }
+
+    .logo {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 2.8rem;
+    }
+
+    h1 {
+      font-size: clamp(2.6rem, 7vw, 4rem);
+      font-weight: 800;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.2rem;
+      background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.65) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .tagline {
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.6;
+      margin-bottom: 3rem;
+    }
+
+    .notify-form {
+      display: flex;
+      gap: 0.5rem;
+      max-width: 380px;
+      margin: 0 auto 2.5rem;
+    }
+
+    .notify-form input {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .notify-form input::placeholder {
+      color: rgba(255,255,255,0.3);
+    }
+
+    .notify-form input:focus {
+      border-color: rgba(255,255,255,0.3);
+    }
+
+    .notify-form button {
+      padding: 0.75rem 1.2rem;
+      border-radius: 8px;
+      border: none;
+      background: #fff;
+      color: #0f0f13;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.2s;
+    }
+
+    .notify-form button:hover {
+      opacity: 0.88;
+    }
+
+    .footer-note {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.22);
+      letter-spacing: 0.02em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">Kidcierge</div>
+    <h1>Something great<br>is on its way.</h1>
+    <p class="tagline">The smart way to find activities for your kids.<br>Launching soon.</p>
+
+    <form class="notify-form" onsubmit="handleSubmit(event)">
+      <input type="email" id="email" placeholder="your@email.com" required />
+      <button type="submit">Notify me</button>
+    </form>
+
+    <p class="footer-note" id="status">&copy; 2026 Kidcierge</p>
+  </div>
+
+  <script>
+    function handleSubmit(e) {
+      e.preventDefault();
+      const status = document.getElementById("status");
+      status.textContent = "You're on the list. We'll be in touch.";
+      status.style.color = "rgba(255,255,255,0.5)";
+      document.querySelector(".notify-form").style.opacity = "0.4";
+      document.querySelector(".notify-form input").disabled = true;
+      document.querySelector(".notify-form button").disabled = true;
+    }
+  </script>
+</body>
+</html>
